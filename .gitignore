@@ -1,2 +1,6 @@
 tsd.js
 **/*.swp
+.tscache
+build
+node_modules
+tsd.d.ts
