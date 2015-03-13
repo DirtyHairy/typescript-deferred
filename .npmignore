@@ -1,0 +1,4 @@
+.git
+**/*.swp
+.tscache
+node_modules

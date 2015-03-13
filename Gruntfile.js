@@ -1,6 +1,3 @@
-var testHarness = require('./test_harness'),
-    promisesAplusTests = require('promises-aplus-tests');
-
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-ts');
@@ -8,6 +5,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-wrap');
+    grunt.loadNpmTasks('grunt-text-replace');
 
     grunt.initConfig({
         ts: {
@@ -50,9 +48,20 @@ module.exports = function(grunt) {
                 src: 'tsd.d.ts',
                 dest: 'tsd.d.ts',
                 options: {
-                    wrapper: ['module "tsd" {\n', '\n}\n'],
+                    wrapper: ['declare module "typescript-deferred" {\n', '\n}\n'],
                     indent: '    '
                 }
+            }
+        },
+
+        replace: {
+            tsd: {
+                src: 'tsd.d.ts',
+                dest: 'tsd.d.ts',
+                replacements: [{
+                    from: /declare /g,
+                    to: ''
+                }]
             }
         },
 
@@ -62,6 +71,9 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('test', 'Run the Promises/A+ test suite', function() {
+        var testHarness = require('./test_harness'),
+            promisesAplusTests = require('promises-aplus-tests');
+
         var done = this.async();
 
         promisesAplusTests(testHarness, function(err) {
@@ -69,5 +81,5 @@ module.exports = function(grunt) {
         });
     });
 
-    grunt.registerTask('default', ['clean', 'ts', 'wrap', 'browserify', 'uglify']);
+    grunt.registerTask('default', ['clean', 'ts', 'replace', 'wrap', 'browserify', 'uglify']);
 };
