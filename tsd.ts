@@ -23,6 +23,8 @@
  * 
  */
 
+'use strict';
+
 export enum ChainMode {Deferred, Immediate}
 
 export interface ImmediateSuccessCB<T, TP> {
@@ -93,7 +95,7 @@ export interface PromiseInterface<T> extends ThenableInterface<T> {
     always<TP>(errorCB?: DeferredErrorCB<TP>) : PromiseInterface<TP>;
 }
 
-export interface DeferredInterface<T> extends PromiseInterface<T> {
+export interface DeferredInterface<T> {
     resolve(value?: T): DeferredInterface<T>;
 
     resolve(value?: ThenableInterface<T>): DeferredInterface<T>;
@@ -163,7 +165,7 @@ export function when(value?: any, successCB?: any, errorCB?: any): any {
     if (value instanceof Deferred || value instanceof Promise) {
         return value.then(successCB, errorCB);
     }
-    return create().resolve(value).then(successCB, errorCB);
+    return create().resolve(value).promise.then(successCB, errorCB);
 }
 
 function getDispatcher(mode: ChainMode): DispatcherInterface {
@@ -240,27 +242,7 @@ class Deferred<T> implements DeferredInterface<T> {
         this.promise = new Promise<T>(this);
     }
 
-    then<TP>(
-            successCB?:  ImmediateSuccessCB<T, TP>,
-            errorCB?:   ImmediateErrorCB<TP>
-        ): PromiseInterface<TP>;
-
-    then<TP>(
-            successCB?:   DeferredSuccessCB<T, TP>,
-            errorCB?:   ImmediateErrorCB<TP>
-        ): PromiseInterface<TP>;
-
-    then<TP>(
-            successCB?:  ImmediateSuccessCB<T, TP>,
-            errorCB?:    DeferredErrorCB<TP>
-        ): PromiseInterface<TP>;
-
-    then<TP>(
-            successCB?:  DeferredSuccessCB<T, TP>,
-            errorCB?:    DeferredErrorCB<TP>
-        ): PromiseInterface<TP>;
-
-    then(successCB: any, errorCB: any): any
+    _then(successCB: any, errorCB: any): any
     {
         if (typeof(successCB) !== 'function' && typeof(errorCB) !== 'function') {
             return this.promise;
@@ -284,23 +266,6 @@ class Deferred<T> implements DeferredInterface<T> {
         }
 
         return client.result.promise;
-    }
-
-
-    otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
-
-    otherwise(errorCB?: DeferredErrorCB<T>) : PromiseInterface<T>;
-
-    otherwise(errorCB: any): any {
-        return this.then(undefined, errorCB);
-    }
-
-    always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
-
-    always<TP>(errorCB?: DeferredErrorCB<TP>) : PromiseInterface<TP>;
-
-    always<TP>(errorCB?: any): any {
-        return this.then(errorCB, errorCB);
     }
 
     resolve(value?: T): DeferredInterface<T>;
@@ -345,7 +310,11 @@ class Deferred<T> implements DeferredInterface<T> {
             } else {
                 this._state = PromiseState.Resolved;
                 this._value = value;
-                this._stack.forEach((client: Client) => client.resolve(value));
+
+                for (var i = 0; i < this._stack.length; i++) {
+                    this._stack[i].resolve(value);
+                }
+
                 this._stack.splice(0, this._stack.length);
             }
         } catch (err) {
@@ -375,7 +344,7 @@ class Deferred<T> implements DeferredInterface<T> {
 }
 
 class Promise<T> implements PromiseInterface<T> {
-    constructor(private _deferred: DeferredInterface<T>) {}
+    constructor(private _deferred: Deferred<T>) {}
 
     then<TP>(
             successCB?:  ImmediateSuccessCB<T, TP>,
@@ -399,15 +368,15 @@ class Promise<T> implements PromiseInterface<T> {
 
     then(successCB: any, errorCB: any): any
     {
-        return this._deferred.then(successCB, errorCB);
+        return this._deferred._then(successCB, errorCB);
     }
 
-    otherwise<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
+    otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
 
-    otherwise<TP>(errorCB?: DeferredErrorCB<TP>) : PromiseInterface<TP>;
+    otherwise(errorCB?: DeferredErrorCB<T>) : PromiseInterface<T>;
 
     otherwise(errorCB: any): any {
-        return this._deferred.always(errorCB);
+        return this._deferred._then(undefined, errorCB);
     }
 
     always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
@@ -415,6 +384,6 @@ class Promise<T> implements PromiseInterface<T> {
     always<TP>(errorCB?: DeferredErrorCB<TP>) : PromiseInterface<TP>;
 
     always<TP>(errorCB?: any): any {
-        return this._deferred.always(errorCB);
+        return this._deferred._then(errorCB, errorCB);
     }
 }
