@@ -6,28 +6,49 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-wrap');
     grunt.loadNpmTasks('grunt-text-replace');
+    grunt.loadNpmTasks('grunt-tsd');
+    grunt.loadNpmTasks('grunt-mocha-test');
 
     grunt.initConfig({
         ts: {
-            tsd: {
-                src: [
-                    'tsd.ts'
-                ]
+            main: {
+                src: ['typescript_deferred.ts'],
+                options: {
+                    target: 'es3',
+                    module: 'commonjs',
+                    declaration: true,
+                    sourceMap: false,
+                    removeComments: true,
+                    noImplicitAny: true
+                }
             },
-            options: {
-                target: 'es3',
-                module: 'commonjs',
-                declaration: true,
-                sourceMap: false,
-                removeComments: true,
-                noImplicitAny: true
-            },
+            test: {
+                src: ['tests/*.ts'],
+                options: {
+                    target: 'es5',
+                    module: 'commonjs',
+                    declaration: false,
+                    sourceMap: false,
+                    removeComments: true,
+                    noImplicitAny: true
+                }
+            }
+        },
+
+        tsd: {
+            refresh: {
+                options: {
+                    command: 'reinstall',
+                    latest: false,
+                    config: 'tsd.json'
+                }
+            }
         },
 
         browserify: {
-            tsd: {
-                src: ['tsd.js'],
-                dest: 'build/tsd.js',
+            main: {
+                src: ['typescript_deferred.js'],
+                dest: 'build/typescript_deferred.js',
                 options: {
                     browserifyOptions: {
                         standalone: 'TypescriptDeferred'
@@ -37,16 +58,27 @@ module.exports = function(grunt) {
         },
 
         uglify: {
-            tsd: {
-                src: 'build/tsd.js',
-                dest: 'build/tsd.min.js'
+            main: {
+                src: 'build/typescript_deferred.js',
+                dest: 'build/typescript_deferred.min.js'
+            }
+        },
+
+        mochaTest: {
+            main: {
+                options: {
+                    reporter: 'spec',
+                    ui: 'tdd',
+                    bail: true
+                },
+                src: ['tests/*.js']
             }
         },
 
         wrap: {
-            tsd: {
-                src: 'tsd.d.ts',
-                dest: 'tsd.d.ts',
+            main: {
+                src: 'typescript_deferred.d.ts',
+                dest: 'typescript_deferred.d.ts',
                 options: {
                     wrapper: ['declare module "typescript-deferred" {\n', '\n}\n'],
                     indent: '    '
@@ -55,9 +87,9 @@ module.exports = function(grunt) {
         },
 
         replace: {
-            tsd: {
-                src: 'tsd.d.ts',
-                dest: 'tsd.d.ts',
+            main: {
+                src: 'typescript_deferred.d.ts',
+                dest: 'typescript_deferred.d.ts',
                 replacements: [{
                     from: /declare /g,
                     to: ''
@@ -66,11 +98,12 @@ module.exports = function(grunt) {
         },
 
         clean: {
-            tsd: ['.tscache', 'tsd.js', 'tsd.d.ts', 'build']
+            main: ['.tscache', 'typescript_deferred.js', 'typescript_deferred.d.ts', 'build', 'tests/**/*.js'],
+            mrproper: ['typings']
         }
     });
 
-    grunt.registerTask('test', 'Run the Promises/A+ test suite', function() {
+    grunt.registerTask('aplus-suite', 'Run the Promises/A+ test suite', function() {
         var testHarness = require('./test_harness'),
             promisesAplusTests = require('promises-aplus-tests');
 
@@ -81,5 +114,7 @@ module.exports = function(grunt) {
         });
     });
 
-    grunt.registerTask('default', ['clean', 'ts', 'replace', 'wrap', 'browserify', 'uglify']);
+    grunt.registerTask('default', ['clean:main', 'ts:main', 'replace', 'wrap', 'browserify', 'uglify']);
+    grunt.registerTask('test', ['clean:main', 'ts', 'aplus-suite', 'mochaTest']);
+    grunt.registerTask('initial', ['clean', 'tsd']);
 };

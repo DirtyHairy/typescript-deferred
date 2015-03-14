@@ -1,4 +1,4 @@
-var tsd = require('./tsd');
+var tsd = require('./typescript_deferred');
 
 module.exports = {
     resolved: function(value) {

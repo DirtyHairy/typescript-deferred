@@ -111,26 +111,12 @@ export function create<T>(mode: ChainMode = ChainMode.Deferred): DeferredInterfa
 
 export function when<T, TP>(
         value?: T,
-        successCB?: ImmediateSuccessCB<T, TP>,
-        errorCB?:  ImmediateErrorCB<TP>
+        successCB?: ImmediateSuccessCB<T, TP>
     ) : PromiseInterface<TP>;
 
 export function when<T, TP>(
         value?: T,
-        successCB?:   DeferredSuccessCB<T, TP>,
-        errorCB?:    ImmediateErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: T,
-        successCB?:  ImmediateSuccessCB<T, TP>,
-        errorCB?:    DeferredErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: T,
-        successCB?:  DeferredSuccessCB<T, TP>,
-        errorCB?:    DeferredErrorCB<TP>
+        successCB?:   DeferredSuccessCB<T, TP>
     ) : PromiseInterface<TP>;
 
 export function when<T, TP>(
@@ -277,11 +263,11 @@ class Deferred<T> implements DeferredInterface<T> {
             return this;
         }
 
-        try {
-            var type = typeof(value),
-                then: any,
-                pending = true;
+        var type = typeof(value),
+            then: any,
+            pending = true;
 
+        try {
             if (    value !== null &&
                     (type === 'object' || type === 'function') &&
                     typeof(then = value.then) === 'function') 
@@ -311,7 +297,10 @@ class Deferred<T> implements DeferredInterface<T> {
                 this._state = PromiseState.Resolved;
                 this._value = value;
 
-                for (var i = 0; i < this._stack.length; i++) {
+                var i: number,
+                    stackSize = this._stack.length;
+
+                for (i = 0; i < stackSize; i++) {
                     this._stack[i].resolve(value);
                 }
 

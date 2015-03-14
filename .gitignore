@@ -1,6 +1,8 @@
-tsd.js
+typescript_deferred.js
 **/*.swp
 .tscache
 build
 node_modules
-tsd.d.ts
+typescript_deferred.d.ts
+typings
+tests/*.js
