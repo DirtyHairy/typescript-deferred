@@ -1,7 +1,6 @@
 typescript_deferred.js
 **/*.swp
 .tscache
-build
 node_modules
 typescript_deferred.d.ts
 typings
