@@ -28,21 +28,31 @@ var Client = (function () {
         this._errorCB = _errorCB;
         this.result = new Deferred(_dispatcher);
     }
-    Client.prototype.resolve = function (value) {
+    Client.prototype.resolve = function (value, defer) {
         var _this = this;
         if (typeof (this._successCB) !== 'function') {
             this.result.resolve(value);
             return;
         }
-        this._dispatcher(function () { return _this._dispatchCallback(_this._successCB, value); });
+        if (defer) {
+            this._dispatcher(function () { return _this._dispatchCallback(_this._successCB, value); });
+        }
+        else {
+            this._dispatchCallback(this._successCB, value);
+        }
     };
-    Client.prototype.reject = function (error) {
+    Client.prototype.reject = function (error, defer) {
         var _this = this;
         if (typeof (this._errorCB) !== 'function') {
             this.result.reject(error);
             return;
         }
-        this._dispatcher(function () { return _this._dispatchCallback(_this._errorCB, error); });
+        if (defer) {
+            this._dispatcher(function () { return _this._dispatchCallback(_this._errorCB, error); });
+        }
+        else {
+            this._dispatchCallback(this._errorCB, error);
+        }
     };
     Client.prototype._dispatchCallback = function (callback, arg) {
         var result, then, type;
@@ -75,10 +85,10 @@ var Deferred = (function () {
                 this._stack.push(client);
                 break;
             case 2 /* Resolved */:
-                client.resolve(this._value);
+                client.resolve(this._value, true);
                 break;
             case 3 /* Rejected */:
-                client.reject(this._error);
+                client.reject(this._error, true);
                 break;
         }
         return client.result.promise;
@@ -91,7 +101,7 @@ var Deferred = (function () {
         var type = typeof (value), then, pending = true;
         try {
             if (value !== null && (type === 'object' || type === 'function') && typeof (then = value.then) === 'function') {
-                if (value === this || value === this.promise) {
+                if (value === this.promise) {
                     throw new TypeError('recursive resolution');
                 }
                 this._state = 1 /* ResolutionInProgress */;
@@ -110,13 +120,16 @@ var Deferred = (function () {
                 });
             }
             else {
-                this._state = 2 /* Resolved */;
-                this._value = value;
-                var i, stackSize = this._stack.length;
-                for (i = 0; i < stackSize; i++) {
-                    this._stack[i].resolve(value);
-                }
-                this._stack.splice(0, stackSize);
+                this._state = 1 /* ResolutionInProgress */;
+                this._dispatcher(function () {
+                    _this._state = 2 /* Resolved */;
+                    _this._value = value;
+                    var i, stackSize = _this._stack.length;
+                    for (i = 0; i < stackSize; i++) {
+                        _this._stack[i].resolve(value, false);
+                    }
+                    _this._stack.splice(0, stackSize);
+                });
             }
         }
         catch (err) {
@@ -127,13 +140,17 @@ var Deferred = (function () {
         return this;
     };
     Deferred.prototype.reject = function (error) {
-        this._state = 3 /* Rejected */;
-        this._error = error;
-        var stackSize = this._stack.length, i = 0;
-        for (i = 0; i < stackSize; i++) {
-            this._stack[i].reject(error);
-        }
-        this._stack.splice(0, stackSize);
+        var _this = this;
+        this._state = 1 /* ResolutionInProgress */;
+        this._dispatcher(function () {
+            _this._state = 3 /* Rejected */;
+            _this._error = error;
+            var stackSize = _this._stack.length, i = 0;
+            for (i = 0; i < stackSize; i++) {
+                _this._stack[i].reject(error, false);
+            }
+            _this._stack.splice(0, stackSize);
+        });
         return this;
     };
     return Deferred;

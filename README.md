@@ -1,6 +1,6 @@
 # What is it?
 
-Typescript-Deferred is a tiny (3.1kB minified)
+Typescript-Deferred is a tiny (3.2kB minified)
 [Promises/A+](https://promisesaplus.com) compliant promise implementation
 written in Typescript.
 

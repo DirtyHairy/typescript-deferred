@@ -138,22 +138,30 @@ class Client {
         this.result = new Deferred<any>(_dispatcher);
     }
 
-    resolve(value: any): void {
+    resolve(value: any, defer: boolean): void {
         if (typeof(this._successCB) !== 'function') {
             this.result.resolve(value);
             return;
         }
 
-        this._dispatcher(() => this._dispatchCallback(this._successCB, value));
+        if (defer) {
+            this._dispatcher(() => this._dispatchCallback(this._successCB, value));
+        } else {
+            this._dispatchCallback(this._successCB, value);
+        }
     }
 
-    reject(error: any): void {
+    reject(error: any, defer: boolean): void {
         if (typeof(this._errorCB) !== 'function') {
             this.result.reject(error);
             return;
         }
 
-        this._dispatcher(() => this._dispatchCallback(this._errorCB, error));
+        if (defer) {
+            this._dispatcher(() => this._dispatchCallback(this._errorCB, error));
+        } else {
+            this._dispatchCallback(this._errorCB, error);
+        }
     }
 
     private _dispatchCallback(callback: (arg: any) => any, arg: any): void {
@@ -193,11 +201,11 @@ class Deferred<T> implements DeferredInterface<T> {
                 break;
 
             case PromiseState.Resolved:
-                client.resolve(this._value);
+                client.resolve(this._value, true);
                 break;
 
             case PromiseState.Rejected:
-                client.reject(this._error);
+                client.reject(this._error, true);
                 break;
         }
 
@@ -222,7 +230,7 @@ class Deferred<T> implements DeferredInterface<T> {
                     (type === 'object' || type === 'function') &&
                     typeof(then = value.then) === 'function') 
             {
-                if (value === this || value === this.promise) {
+                if (value === this.promise) {
                     throw new TypeError('recursive resolution');
                 }
 
@@ -244,17 +252,21 @@ class Deferred<T> implements DeferredInterface<T> {
                     }
                 );
             } else {
-                this._state = PromiseState.Resolved;
-                this._value = value;
+                this._state = PromiseState.ResolutionInProgress;
 
-                var i: number,
-                    stackSize = this._stack.length;
+                this._dispatcher(() => {
+                    this._state = PromiseState.Resolved;
+                    this._value = value;
 
-                for (i = 0; i < stackSize; i++) {
-                    this._stack[i].resolve(value);
-                }
+                    var i: number,
+                        stackSize = this._stack.length;
 
-                this._stack.splice(0, stackSize);
+                    for (i = 0; i < stackSize; i++) {
+                        this._stack[i].resolve(value, false);
+                    }
+
+                    this._stack.splice(0, stackSize);
+                });
             }
         } catch (err) {
             if (pending) {
@@ -266,17 +278,21 @@ class Deferred<T> implements DeferredInterface<T> {
     }
 
     reject(error?: any): DeferredInterface<T> {
-        this._state = PromiseState.Rejected;
-        this._error = error;
+        this._state = PromiseState.ResolutionInProgress;
 
-        var stackSize = this._stack.length,
-            i = 0;
+        this._dispatcher(() => {
+            this._state = PromiseState.Rejected;
+            this._error = error;
 
-        for (i = 0; i < stackSize; i++) {
-            this._stack[i].reject(error);
-        }
+            var stackSize = this._stack.length,
+                i = 0;
 
-        this._stack.splice(0, stackSize);
+            for (i = 0; i < stackSize; i++) {
+                this._stack[i].reject(error, false);
+            }
+
+            this._stack.splice(0, stackSize);
+        });
 
         return this;
     }
