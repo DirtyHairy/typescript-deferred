@@ -7,10 +7,10 @@ implementation written in Typescript.
 
 There are many excellent promise implementations out there, and there is absolutely
 no need for another one. Typescript-Deferred was created for the fun of it and
-for getting a better grip on the typescript typing system.
+for getting a better grip on the Typescript typing system.
 
 However, the result fully implements the spec, is small and has zero dependencies, so
-it may be a pretty good fit if you want to add A+ compliant promises to a
+it may be a good fit if you want to add A+ compliant promises to a
 library or API without increasing the footprint. The code should work pretty much
 everywhere, but I have not tested this extensively --- go ahead and tell
 me if it breaks.
@@ -22,15 +22,15 @@ me if it breaks.
 Typescript-Deferred supports a variety of packaging options:
 
 * **npm / browserify**: install from npm, require the module via
-  `typescriptDeferred = require('typescript-deferred')`. The typescript
+  `typescriptDeferred = require('typescript-deferred')`. The Typescript
   header is `typescript_deferred.d.ts`.
 * **RequireJS / AMD**: Get `build/typescript_deferred.min.js` either via bower or
   from the github repo. This file is a UMD build that can be used with
-  RequireJS and other AMD loaders. The typescript header is `build/typescript_deferred.d.ts`
+  RequireJS and other AMD loaders. The Typescript header is `build/typescript_deferred.d.ts`
 * **Plain script tag**: Get `build/typescript_deferred.min.js` either via bower or
   from the github repo. This UMD build can be loaded via script tag
   in the browser, the namespace is exported as `window.typescriptDeferred`. The
-  corresponding typescript header is `build/typescript_deferred_standalone.d.ts`.
+  corresponding Typescript header is `build/typescript_deferred_standalone.d.ts`.
 
 As I am too lazy to type `typescriptDeferred`, we'll use `tsd` from now on.
 
@@ -67,7 +67,7 @@ In Typescript, the fully typed version of this code looks like
     var promise: tsd.PromiseInterface<number> =
         tsd.when<sometype>(someThenable);
  
-If the argument to `when` is a plain value, typescript can infer the type, so
+If the argument to `when` is a plain value, Typescript can infer the type, so
 the explicit type parameter is not necessary in this case. However, if we pass
 a `tsd.ThenableInterface<sometype>`, the type wrapped by the thenable must be
 annotated by using `when<sometype>(...)`.
@@ -83,7 +83,8 @@ according the the Promises/A+ specs.
 
 In Javascript, this looks like
 
-    var deferred = tsd.create<number>();
+    // Create a new deferred for a number
+    var deferred = tsd.create();
 
     // Use the promise wrapped by the deferred
     deferred.promise.then(...);
@@ -126,7 +127,7 @@ most situations.
 The promises implemented by this package provide a `then` method that complies
 with the Promises/A+ standard.
 
-In **typescript**, `then` is typed as a generic, taking the target type of
+In **Typescript**, `then` is typed as a generic, taking the target type of
 the callbacks as a type parameter. If the result of the callbacks is a plain
 value, type inference will do its magic and render the type argument unecessary,
 but you'll have to supply it if the target type is again wrapped by a promise.
@@ -161,13 +162,19 @@ is equivalent to
 **Typescript**
 
 `otherwise` can change the type wrapped by the promise and carries a type parameter
-just like `then`. In most case, type inference will safe you the work of specifying it.
+just like `then`. In most cases, type inference will safe you the work of specifying it.
 
 ## More Typescript
 
-The full typescript interface is described by the typescript header `typescript_deferred.d.ts`.
+Promises are described by the interface `tsd.PromiseInterface<sometype>` which
+builds upon the thenable interface `tsd.ThenableInterface<sometype>`. If you
+need to adopt foreign thenables that do not fully declare this interface (very
+likely as it contains the necessary overloads to describe the different
+invocations of `then`), you'll have to cast.
 
-# Building and tests
+The full Typescript interface is described by the Typescript header `typescript_deferred.d.ts`.
+
+# Building and Tests
 
 In orde to build the code yourself, you need `grunt-cli` installed and `grunt` available
 in your path.
@@ -179,7 +186,7 @@ The code can then be build and tested via
     > grunt build
     > grunt test
 
-The testsuite runs the full Promises/A+ suite in its full 800+ test glory and some
+The testsuite runs the full Promises/A+ suite in its full 800+ test case glory and some
 more tests for the additional functionality provided by this package.
 
 # Can I use this in my project under license XYZ?
