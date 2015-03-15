@@ -109,49 +109,15 @@ export function create<T>(mode: ChainMode = ChainMode.Deferred): DeferredInterfa
     return new Deferred(getDispatcher(mode));
 }
 
-export function when<T, TP>(
-        value?: T,
-        successCB?: ImmediateSuccessCB<T, TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: T,
-        successCB?:   DeferredSuccessCB<T, TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: ThenableInterface<T>,
-        successCB?: ImmediateSuccessCB<T, TP>,
-        errorCB?:  ImmediateErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: ThenableInterface<T>,
-        successCB?:   DeferredSuccessCB<T, TP>,
-        errorCB?:    ImmediateErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: ThenableInterface<T>,
-        successCB?:  ImmediateSuccessCB<T, TP>,
-        errorCB?:    DeferredErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
-export function when<T, TP>(
-        value?: ThenableInterface<T>,
-        successCB?:  DeferredSuccessCB<T, TP>,
-        errorCB?:    DeferredErrorCB<TP>
-    ) : PromiseInterface<TP>;
-
 export function when<T>(value?: T): PromiseInterface<T>;
 
 export function when<T>(value?: ThenableInterface<T>): PromiseInterface<T>;
 
-export function when(value?: any, successCB?: any, errorCB?: any): any {
-    if (value instanceof Deferred || value instanceof Promise) {
-        return value.then(successCB, errorCB);
+export function when(value?: any): any {
+    if (value instanceof Promise) {
+        return value;
     }
-    return create().resolve(value).promise.then(successCB, errorCB);
+    return create().resolve(value).promise;
 }
 
 function getDispatcher(mode: ChainMode): DispatcherInterface {

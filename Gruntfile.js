@@ -115,6 +115,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('default', ['clean:main', 'ts:main', 'replace', 'wrap', 'browserify', 'uglify']);
-    grunt.registerTask('test', ['clean:main', 'ts', 'aplus-suite', 'mochaTest']);
+    grunt.registerTask('test', ['ts', 'aplus-suite', 'mochaTest']);
     grunt.registerTask('initial', ['clean', 'tsd']);
 };
