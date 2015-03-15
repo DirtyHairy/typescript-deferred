@@ -26,6 +26,7 @@
     "typings",
     "tests/*.js",
     "typescript_deferred.js",
+    "!build/typescript_deferred.js",
     "typescript_deffered.d.ts"
   ]
 }
