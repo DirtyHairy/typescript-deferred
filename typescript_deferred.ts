@@ -123,7 +123,7 @@ interface DispatcherInterface {
 }
 
 function DispatchDeferred(closure: () => void) {
-    setTimeout(() => closure(), 0);
+    setTimeout(closure, 0);
 }
 
 enum PromiseState {Pending, ResolutionInProgress, Resolved, Rejected}

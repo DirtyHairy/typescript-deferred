@@ -12,7 +12,7 @@ function when(value) {
 }
 exports.when = when;
 function DispatchDeferred(closure) {
-    setTimeout(function () { return closure(); }, 0);
+    setTimeout(closure, 0);
 }
 var PromiseState;
 (function (PromiseState) {
