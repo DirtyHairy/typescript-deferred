@@ -180,7 +180,7 @@ The full Typescript interface is described by the Typescript header `typescript_
 In orde to build the code yourself, you need `grunt-cli` installed and `grunt` available
 in your path.
 
-The code can then be build and tested via
+The code can then be built and tested via
 
     > npm install
     > grunt initial
