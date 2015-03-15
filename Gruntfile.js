@@ -51,7 +51,7 @@ module.exports = function(grunt) {
                 dest: 'build/typescript_deferred.js',
                 options: {
                     browserifyOptions: {
-                        standalone: 'TypescriptDeferred'
+                        standalone: 'typescriptDeferred'
                     }
                 }
             }
@@ -80,9 +80,25 @@ module.exports = function(grunt) {
                 src: 'typescript_deferred.d.ts',
                 dest: 'typescript_deferred.d.ts',
                 options: {
-                    wrapper: ['declare module "typescript-deferred" {\n', '\n}\n'],
-                    indent: '    '
+                    wrapper: ['declare module "typescript-deferred" {\n', '\n}\n']
                 }
+            },
+            build: {
+                src: 'typescript_deferred.d.ts',
+                dest: 'build/typescript_deferred.d.ts',
+                options: {
+                    wrapper: ['declare module "typescript-deferred" {\n', '\n}\n']
+                }
+            },
+            build_standalone: {
+                src: 'typescript_deferred.d.ts',
+                dest: 'build/typescript_deferred_standalone.d.ts',
+                options: {
+                    wrapper: ['declare module typescriptDeferred {\n', '\n}\n']
+                }
+            },
+            options: {
+                indent: '    '
             }
         },
 
@@ -114,7 +130,8 @@ module.exports = function(grunt) {
         });
     });
 
-    grunt.registerTask('default', ['clean:main', 'ts:main', 'replace', 'wrap', 'browserify', 'uglify']);
-    grunt.registerTask('test', ['ts', 'aplus-suite', 'mochaTest']);
+    grunt.registerTask('default', ['build']);
+    grunt.registerTask('build', ['clean:main', 'ts:main', 'replace', 'wrap:build', 'wrap:build_standalone', 'wrap:main', 'browserify', 'uglify']);
+    grunt.registerTask('test', ['clean:main', 'ts', 'aplus-suite', 'mochaTest']);
     grunt.registerTask('initial', ['clean', 'tsd']);
 };
