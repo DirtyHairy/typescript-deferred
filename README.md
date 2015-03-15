@@ -145,10 +145,10 @@ is equivalent to
 
     var foo = promise.then(callback, callback);
 
-**Typescript considerations**
+**Typescript**
 
-The `always` callback cannot alter the type wrapped by the promise --- there is
-no type parameter.
+`always` can change the type wrapped by the promise and carries a type parameter
+just like `then`. In most cases, type inference will safe you the work of specifying it.
 
 ### otherwise
 
@@ -162,8 +162,8 @@ is equivalent to
 
 **Typescript**
 
-`otherwise` can change the type wrapped by the promise and carries a type parameter
-just like `then`. In most cases, type inference will safe you the work of specifying it.
+`otherwise` cannot alter the type wrapped by the promise --- there is
+no type parameter.
 
 ## More Typescript
 
