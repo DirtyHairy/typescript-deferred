@@ -2,3 +2,5 @@
 **/*.swp
 .tscache
 node_modules
+typings
+tests/*.js
