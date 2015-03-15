@@ -59,7 +59,7 @@ function assertRejectsTo(
     });
 }
 
-suite('typescript-deferred.when', function() {
+suite('typescript-deferred::when', function() {
 
     this.timeout(100);
 

@@ -25,8 +25,6 @@
 
 'use strict';
 
-export enum ChainMode {Deferred, Immediate}
-
 export interface ImmediateSuccessCB<T, TP> {
     (value: T): TP;
 }
@@ -105,8 +103,8 @@ export interface DeferredInterface<T> {
     promise: PromiseInterface<T>;
 }
 
-export function create<T>(mode: ChainMode = ChainMode.Deferred): DeferredInterface<T> {
-    return new Deferred(getDispatcher(mode));
+export function create<T>(): DeferredInterface<T> {
+    return new Deferred(DispatchDeferred);
 }
 
 export function when<T>(value?: T): PromiseInterface<T>;
@@ -120,22 +118,8 @@ export function when(value?: any): any {
     return create().resolve(value).promise;
 }
 
-function getDispatcher(mode: ChainMode): DispatcherInterface {
-    switch(mode) {
-        case ChainMode.Immediate:
-            return DispatchImmediate;
-
-        default:
-            return DispatchDeferred;
-    }
-}
-
 interface DispatcherInterface {
     (closure: () => void): void;
-}
-
-function DispatchImmediate(closure: () => void) {
-    closure();
 }
 
 function DispatchDeferred(closure: () => void) {
