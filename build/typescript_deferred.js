@@ -116,7 +116,7 @@ var Deferred = (function () {
                 for (i = 0; i < stackSize; i++) {
                     this._stack[i].resolve(value);
                 }
-                this._stack.splice(0, this._stack.length);
+                this._stack.splice(0, stackSize);
             }
         }
         catch (err) {
@@ -129,8 +129,11 @@ var Deferred = (function () {
     Deferred.prototype.reject = function (error) {
         this._state = 3 /* Rejected */;
         this._error = error;
-        this._stack.forEach(function (client) { return client.reject(error); });
-        this._stack.splice(0, this._stack.length);
+        var stackSize = this._stack.length, i = 0;
+        for (i = 0; i < stackSize; i++) {
+            this._stack[i].reject(error);
+        }
+        this._stack.splice(0, stackSize);
         return this;
     };
     return Deferred;

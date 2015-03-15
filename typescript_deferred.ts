@@ -254,7 +254,7 @@ class Deferred<T> implements DeferredInterface<T> {
                     this._stack[i].resolve(value);
                 }
 
-                this._stack.splice(0, this._stack.length);
+                this._stack.splice(0, stackSize);
             }
         } catch (err) {
             if (pending) {
@@ -268,8 +268,15 @@ class Deferred<T> implements DeferredInterface<T> {
     reject(error?: any): DeferredInterface<T> {
         this._state = PromiseState.Rejected;
         this._error = error;
-        this._stack.forEach((client: Client) => client.reject(error));
-        this._stack.splice(0, this._stack.length);
+
+        var stackSize = this._stack.length,
+            i = 0;
+
+        for (i = 0; i < stackSize; i++) {
+            this._stack[i].reject(error);
+        }
+
+        this._stack.splice(0, stackSize);
 
         return this;
     }

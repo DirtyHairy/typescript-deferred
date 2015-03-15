@@ -24,6 +24,8 @@
     ".tscache",
     "node_modules",
     "typings",
-    "tests/*.js"
+    "tests/*.js",
+    "typescript_deferred.js",
+    "typescript_deffered.d.ts"
   ]
 }

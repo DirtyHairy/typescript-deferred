@@ -132,6 +132,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build', ['clean:main', 'ts:main', 'replace', 'wrap:build', 'wrap:build_standalone', 'wrap:main', 'browserify', 'uglify']);
-    grunt.registerTask('test', ['clean:main', 'ts', 'aplus-suite', 'mochaTest']);
+    grunt.registerTask('test', ['ts', 'aplus-suite', 'mochaTest']);
     grunt.registerTask('initial', ['clean', 'tsd']);
 };
