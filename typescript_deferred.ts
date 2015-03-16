@@ -221,6 +221,10 @@ class Deferred<T> implements DeferredInterface<T> {
             return this;
         }
 
+        return this._resolve(value);
+    }
+
+    private _resolve(value: any): DeferredInterface<T> {
         var type = typeof(value),
             then: any,
             pending = true;
@@ -239,15 +243,13 @@ class Deferred<T> implements DeferredInterface<T> {
                     (result: any): void => {
                         if (pending) {
                             pending = false;
-                            this._state = PromiseState.Pending;
-                            this.resolve(result);
+                            this._resolve(result);
                         }
                     },
                     (error: any): void => {
                         if (pending) {
                             pending = false;
-                            this._state = PromiseState.ResolutionInProgress;
-                            this.reject(error);
+                            this._reject(error);
                         }
                     }
                 );
@@ -270,7 +272,7 @@ class Deferred<T> implements DeferredInterface<T> {
             }
         } catch (err) {
             if (pending) {
-                this.reject(err);
+                this._reject(err);
             }
         }
 
@@ -278,6 +280,14 @@ class Deferred<T> implements DeferredInterface<T> {
     }
 
     reject(error?: any): DeferredInterface<T> {
+        if (this._state !== PromiseState.Pending) {
+            return this;
+        }
+
+        return this._reject(error);
+    }
+
+    private _reject(error?: any): DeferredInterface<T> {
         this._state = PromiseState.ResolutionInProgress;
 
         this._dispatcher(() => {

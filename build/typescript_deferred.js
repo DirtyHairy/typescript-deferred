@@ -94,10 +94,13 @@ var Deferred = (function () {
         return client.result.promise;
     };
     Deferred.prototype.resolve = function (value) {
-        var _this = this;
         if (this._state !== 0 /* Pending */) {
             return this;
         }
+        return this._resolve(value);
+    };
+    Deferred.prototype._resolve = function (value) {
+        var _this = this;
         var type = typeof (value), then, pending = true;
         try {
             if (value !== null && (type === 'object' || type === 'function') && typeof (then = value.then) === 'function') {
@@ -108,14 +111,12 @@ var Deferred = (function () {
                 then.call(value, function (result) {
                     if (pending) {
                         pending = false;
-                        _this._state = 0 /* Pending */;
-                        _this.resolve(result);
+                        _this._resolve(result);
                     }
                 }, function (error) {
                     if (pending) {
                         pending = false;
-                        _this._state = 1 /* ResolutionInProgress */;
-                        _this.reject(error);
+                        _this._reject(error);
                     }
                 });
             }
@@ -134,12 +135,18 @@ var Deferred = (function () {
         }
         catch (err) {
             if (pending) {
-                this.reject(err);
+                this._reject(err);
             }
         }
         return this;
     };
     Deferred.prototype.reject = function (error) {
+        if (this._state !== 0 /* Pending */) {
+            return this;
+        }
+        return this._reject(error);
+    };
+    Deferred.prototype._reject = function (error) {
         var _this = this;
         this._state = 1 /* ResolutionInProgress */;
         this._dispatcher(function () {
