@@ -1,6 +1,11 @@
+<a href="https://promisesaplus.com/">
+    <img src="https://promisesaplus.com/assets/logo-small.png" alt="Promises/A+ logo"
+         title="Promises/A+ 1.0 compliant" align="right" />
+</a>
+
 # What is it?
 
-Typescript-Deferred is a tiny (3.2kB minified)
+Typescript-Deferred is a tiny (3.3kB minified)
 [Promises/A+](https://promisesaplus.com) compliant promise implementation
 written in Typescript.
 
@@ -174,6 +179,32 @@ likely as it contains the necessary overloads to describe the different
 invocations of `then`), you'll have to cast.
 
 The full Typescript interface is described by the Typescript header `typescript_deferred.d.ts`.
+
+### Warning: then vs. type safety
+
+Using `then` to attach an error handler without providing a success handle
+allows you to accidentially bypass Typescript's type system:
+
+    // Create a new deferred for a string
+    var deferred: tsd.DeferredInterface<string> = tsd.create();
+
+    // Transform into a promise for a number
+    var promise: tsd.PromiseInterface<number> =
+        deferred.promise.then(undefined, () => 10);
+
+    // Whoops, promise now wraps a string (contrary to its type!)
+    deferred.resolve('foo');
+
+The reason for this behavior is that `undefined` passes as a perfectly valid value for
+`tsd.ImmediateSuccessCB<string, number>` but actually causes the string value to
+propagate if the deferred is resolved.
+
+Unfortunately, there is no way to avoid this trap without departing from the
+Promises/A+ spec. If you want fully typed code without this kind of hidden
+type violations, you should use the `otherwise` method described above if you
+just want to attach an error handler which cannot change the type wrapped
+by the promise. Note that using `then` to attach just a success handler or
+both handler is fine and cannot lead to type violation.
 
 # Building and Tests
 

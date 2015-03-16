@@ -8,7 +8,7 @@ suite('Extra promise utils', function() {
 
     this.timeout(100);
 
-    suite('Promise::always', function() {
+    suite('typescript-deferred.Promise::always', function() {
 
         test('callback is invoked upon resolution', function(done) {
             var deferred = tsd.create<number>();
