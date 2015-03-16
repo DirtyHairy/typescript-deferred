@@ -1,6 +1,6 @@
 {
   "name": "typescript-deferred",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "homepage": "https://github.com/DirtyHairy/typescript-deferred",
   "authors": [
     "Christian Speckner <cnspeckn@googlemail.com>"
@@ -15,7 +15,8 @@
   "keywords": [
     "promise",
     "deferred",
-    "typescript"
+    "typescript",
+    "promises-aplus"
   ],
   "license": "MIT",
   "ignore": [
