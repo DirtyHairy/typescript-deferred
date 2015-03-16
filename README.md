@@ -202,9 +202,9 @@ propagate if the deferred is resolved.
 Unfortunately, there is no way to avoid this trap without departing from the
 Promises/A+ spec. If you want fully typed code without this kind of hidden
 type violations, you should use the `otherwise` method described above if you
-just want to attach an error handler which cannot change the type wrapped
+just want to attach an error handler. `otherwise` cannot change the type wrapped
 by the promise. Note that using `then` to attach just a success handler or
-both handler is fine and cannot lead to type violation.
+both handler is fine and cannot lead to type violations.
 
 # Building and Tests
 
