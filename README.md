@@ -70,7 +70,7 @@ In Typescript, the fully typed version of this code looks like
 
     // A promise that adops the state of some other thenable that wraps a value
     // of type sometype
-    var promise: tsd.PromiseInterface<number> =
+    var promise: tsd.PromiseInterface<sometype> =
         tsd.when<sometype>(someThenable);
  
 If the argument to `when` is a plain value, Typescript can infer the type, so
