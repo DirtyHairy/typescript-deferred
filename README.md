@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/DirtyHairy/typescript-deferred.svg?branch=master)](https://travis-ci.org/DirtyHairy/typescript-deferred)
 <a href="https://promisesaplus.com/">
     <img src="https://promisesaplus.com/assets/logo-small.png" alt="Promises/A+ logo"
          title="Promises/A+ 1.0 compliant" align="right" />
