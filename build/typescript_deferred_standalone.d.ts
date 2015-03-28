@@ -13,30 +13,30 @@ declare module typescriptDeferred {
         (error: any): ThenableInterface<TP>;
     }
     export interface ThenableInterface<T> {
-        then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): ThenableInterface<TP>;
+        then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): ThenableInterface<TP>;
         then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): ThenableInterface<TP>;
         then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): ThenableInterface<TP>;
-        then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): ThenableInterface<TP>;
+        then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): ThenableInterface<TP>;
     }
     export interface PromiseInterface<T> extends ThenableInterface<T> {
-        then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
+        then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): PromiseInterface<TP>;
         then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
         then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): PromiseInterface<TP>;
-        then<TP>(successCB?: DeferredSuccessCB<T, TP>, errorCB?: DeferredErrorCB<TP>): PromiseInterface<TP>;
-        otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
+        then<TP>(successCB?: ImmediateSuccessCB<T, TP>, errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
         otherwise(errorCB?: DeferredErrorCB<T>): PromiseInterface<T>;
-        always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
+        otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
         always<TP>(errorCB?: DeferredErrorCB<TP>): PromiseInterface<TP>;
+        always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
     }
     export interface DeferredInterface<T> {
-        resolve(value?: T): DeferredInterface<T>;
         resolve(value?: ThenableInterface<T>): DeferredInterface<T>;
+        resolve(value?: T): DeferredInterface<T>;
         reject(error?: any): DeferredInterface<T>;
         promise: PromiseInterface<T>;
     }
     export function create<T>(): DeferredInterface<T>;
-    export function when<T>(value?: T): PromiseInterface<T>;
     export function when<T>(value?: ThenableInterface<T>): PromiseInterface<T>;
+    export function when<T>(value?: T): PromiseInterface<T>;
     
 
 }

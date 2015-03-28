@@ -73,10 +73,16 @@ In Typescript, the fully typed version of this code looks like
     var promise: tsd.PromiseInterface<sometype> =
         tsd.when<sometype>(someThenable);
  
-If the argument to `when` is a plain value, Typescript can infer the type, so
-the explicit type parameter is not necessary in this case. However, if we pass
-a `tsd.ThenableInterface<sometype>`, the type wrapped by the thenable must be
-annotated by using `when<sometype>(...)`.
+Note that `when` carries a type parameter that will be inferred automatically
+by the compiler --- you won't have to specify it explicitly, even if the result
+type is wrapped by a promise. In other words, a less verbose but working version
+of the same example is
+
+    var promise: tsd.PromiseInterface<number> =
+        tsd.when(10);
+
+    var promise: tsd.PromiseInterface<sometype> =
+        tsd.when(someThenable);
 
 ### tsd.create
 
@@ -118,15 +124,14 @@ In Typescript, the fully typed version of this code looks like
     // Resolve the promise with a value...
     deferred.resolve(10);
 
-    // ... or adopt another thenable which wraps a value of sometype ...
-    deferred.resolve<sometype>(someThenable);
+    // ... or adopt another thenable which wraps a value of number ...
+    deferred.resolve(someThenable);
 
     // ... or reject it with some reason (reasons are always type as any)
     deferred.reject(reason);
 
-
-Again, depending on the context, the explicit type argument can be left out in
-most situations.
+Again, the type parameter of `then` can be inferred by the compiler and left out
+(see below).
 
 ## Using promises
 
@@ -134,9 +139,8 @@ The promises implemented by this package provide a `then` method that complies
 with the Promises/A+ standard.
 
 In **Typescript**, `then` is typed as a generic, taking the target type of
-the callbacks as a type parameter. If the result of the callbacks is a plain
-value, type inference will do its magic and render the type argument unecessary,
-but you'll have to supply it if the target type is again wrapped by a promise.
+the callbacks as a type parameter which the compiler can infer from the callback type.
+Type inference always works, even if the result type is again wrapped by a promise.
 
 In addtion to then, two convenience methods `always` and `otherwise` are supplied.
 
@@ -153,7 +157,7 @@ is equivalent to
 **Typescript**
 
 `always` can change the type wrapped by the promise and carries a type parameter
-just like `then`. In most cases, type inference will safe you the work of specifying it.
+just like `then`.
 
 ### otherwise
 

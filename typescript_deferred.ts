@@ -43,8 +43,8 @@ export interface DeferredErrorCB<TP> {
 
 export interface ThenableInterface<T> {
     then<TP>(
-            successCB?:  ImmediateSuccessCB<T, TP>,
-            errorCB?:   ImmediateErrorCB<TP>
+            successCB?:  DeferredSuccessCB<T, TP>,
+            errorCB?:    DeferredErrorCB<TP>
         ): ThenableInterface<TP>;
 
     then<TP>(
@@ -58,15 +58,15 @@ export interface ThenableInterface<T> {
         ): ThenableInterface<TP>;
 
     then<TP>(
-            successCB?:  DeferredSuccessCB<T, TP>,
-            errorCB?:    DeferredErrorCB<TP>
+            successCB?:  ImmediateSuccessCB<T, TP>,
+            errorCB?:   ImmediateErrorCB<TP>
         ): ThenableInterface<TP>;
 }
 
 export interface PromiseInterface<T> extends ThenableInterface<T> {
     then<TP>(
-            successCB?:  ImmediateSuccessCB<T, TP>,
-            errorCB?:   ImmediateErrorCB<TP>
+            successCB?:  DeferredSuccessCB<T, TP>,
+            errorCB?:    DeferredErrorCB<TP>
         ): PromiseInterface<TP>;
 
     then<TP>(
@@ -80,23 +80,24 @@ export interface PromiseInterface<T> extends ThenableInterface<T> {
         ): PromiseInterface<TP>;
 
     then<TP>(
-            successCB?:  DeferredSuccessCB<T, TP>,
-            errorCB?:    DeferredErrorCB<TP>
+            successCB?:  ImmediateSuccessCB<T, TP>,
+            errorCB?:   ImmediateErrorCB<TP>
         ): PromiseInterface<TP>;
 
-    otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
 
     otherwise(errorCB?: DeferredErrorCB<T>) : PromiseInterface<T>;
 
-    always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
+    otherwise(errorCB?: ImmediateErrorCB<T>): PromiseInterface<T>;
 
     always<TP>(errorCB?: DeferredErrorCB<TP>) : PromiseInterface<TP>;
+
+    always<TP>(errorCB?: ImmediateErrorCB<TP>): PromiseInterface<TP>;
 }
 
 export interface DeferredInterface<T> {
-    resolve(value?: T): DeferredInterface<T>;
-
     resolve(value?: ThenableInterface<T>): DeferredInterface<T>;
+
+    resolve(value?: T): DeferredInterface<T>;
 
     reject(error?: any): DeferredInterface<T>;
 
@@ -107,9 +108,9 @@ export function create<T>(): DeferredInterface<T> {
     return new Deferred(DispatchDeferred);
 }
 
-export function when<T>(value?: T): PromiseInterface<T>;
-
 export function when<T>(value?: ThenableInterface<T>): PromiseInterface<T>;
+
+export function when<T>(value?: T): PromiseInterface<T>;
 
 export function when(value?: any): any {
     if (value instanceof Promise) {
@@ -319,8 +320,8 @@ class Promise<T> implements PromiseInterface<T> {
     constructor(private _deferred: Deferred<T>) {}
 
     then<TP>(
-            successCB?:  ImmediateSuccessCB<T, TP>,
-            errorCB?:   ImmediateErrorCB<TP>
+            successCB?:  DeferredSuccessCB<T, TP>,
+            errorCB?:    DeferredErrorCB<TP>
         ): PromiseInterface<TP>;
 
     then<TP>(
@@ -334,8 +335,8 @@ class Promise<T> implements PromiseInterface<T> {
         ): PromiseInterface<TP>;
 
     then<TP>(
-            successCB?:  DeferredSuccessCB<T, TP>,
-            errorCB?:    DeferredErrorCB<TP>
+            successCB?:  ImmediateSuccessCB<T, TP>,
+            errorCB?:   ImmediateErrorCB<TP>
         ): PromiseInterface<TP>;
 
     then(successCB: any, errorCB: any): any
