@@ -1,6 +1,6 @@
 {
   "name": "typescript-deferred",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A tiny Promises/A+ promise implementation written in Typescript",
   "keywords": ["promise", "deferred", "typescript", "promises-aplus"],
   "author": {
