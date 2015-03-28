@@ -140,7 +140,8 @@ with the Promises/A+ standard.
 
 In **Typescript**, `then` is typed as a generic, taking the target type of
 the callbacks as a type parameter which the compiler can infer from the callback type.
-Type inference always works, even if the result type is again wrapped by a promise.
+Type inference works regardless of whether the result type is wrapped by a promise
+or not.
 
 In addtion to then, two convenience methods `always` and `otherwise` are supplied.
 
